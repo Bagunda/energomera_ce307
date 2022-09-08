@@ -1,0 +1,67 @@
+configuration.yaml:
+
+template:
+  - trigger:
+      - platform: webhook
+        webhook_id: webhook_from_schetchik
+    sensor:
+      - name: "Электросчётчик"
+        state: "{{ trigger.json.summ}}"
+        attributes:
+          summ: "{{ trigger.json.summ }}"
+          tarif1: "{{ trigger.json.tarif1 }}"
+          tarif2: "{{ trigger.json.tarif2 }}"
+          tarif3: "{{ trigger.json.tarif3 }}"
+
+
+input_number:
+  schetchik_summ:
+    name: Электросчётчик сумма
+    min: 1
+    max: 100000
+  schetchik_tarif1:
+    name: Электросчётчик тариф 1
+    min: 1
+    max: 100000
+  schetchik_tarif2:
+    name: Электросчётчик тариф 2
+    min: 1
+    max: 100000
+  schetchik_tarif3:
+    name: Электросчётчик тариф 3
+    min: 1
+    max: 100000
+    
+
+
+automations.yaml:
+- id: '1662575267343'
+  alias: Счётчик to input_number
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.elektroschiotchik
+  condition: []
+  action:
+  - service: input_number.set_value
+    data:
+      value: '{{ (state_attr(''sensor.elektroschiotchik'', ''summ'') | float ) }}'
+    target:
+      entity_id: input_number.schetchik_summ
+  - service: input_number.set_value
+    data:
+      value: '{{ (state_attr(''sensor.elektroschiotchik'', ''tarif1'') | float ) }}'
+    target:
+      entity_id: input_number.schetchik_tarif1
+  - service: input_number.set_value
+    data:
+      value: '{{ (state_attr(''sensor.elektroschiotchik'', ''tarif2'') | float ) }}'
+    target:
+      entity_id: input_number.schetchik_tarif2
+  - service: input_number.set_value
+    data:
+      value: '{{ (state_attr(''sensor.elektroschiotchik'', ''tarif3'') | float ) }}'
+    target:
+      entity_id: input_number.schetchik_tarif3
+  mode: single
