@@ -4,10 +4,30 @@
 import serial
 import time
 import requests
+import os
+import subprocess
+import signal
+import datetime as DT
+
+now = DT.datetime.now(DT.timezone.utc).astimezone()
+time_format = "%Y-%m-%d %H:%M:%S"
+print(f"{now:{time_format}}" + " Program runing...")
+
+pl = subprocess.Popen(['pgrep', '-lf', 'python3'], stdout=subprocess.PIPE).communicate()[0]
+string_ps = pl.decode("utf-8")
+string_ps_arr = string_ps.split(' /usr/bin/python3\n')
+ps_pids_list = []
+if len(string_ps_arr) > 2:
+    for process_str in string_ps_arr:
+        if " " in process_str:
+            pass
+        else:
+            if process_str != '':
+                ps_pids_list.append(int(process_str))
+                os.kill(int(process_str), signal.SIGINT)
 
 COM_PortName = "/dev/ttyUSB0"
 COM_Port = serial.Serial(COM_PortName) # open the COM port
-print('\n   ',COM_PortName,'Opened')
 
 COM_Port.baudrate = 9600               # set Baud rate 
 COM_Port.bytesize = 8                  # Number of data bits = 8
@@ -142,13 +162,22 @@ while cycle_work:
                                     print ("PACKET ELEKTRO TARIF3 CHECKED: " + str(kw_tarif3_checked))
 
                                     dict_for_json = {"summ": kw_summ_checked, "tarif1": kw_tarif1_checked, "tarif2": kw_tarif2_checked, "tarif3": kw_tarif3_checked}
-                                    r = requests.post('http://10.11.12.10:8123/api/webhook/webhook_from_schetchik', json=dict_for_json)
-                                    print(r.status_code)
+                                    url = 'http://10.11.12.10:8123/api/webhook/webhook_from_schetchik'
+                                    r = requests.post(url, json=dict_for_json)
+
+                                    if r.status_code == 200:
+                                        print("Data successfully sended to " + url)
+                                    else:
+                                        print("ERROR! Data doesn't send to " + url)
+                                        print(r.status_code)
 
                                     cycle_work = False
                                     break
                                     continue
-
+                    else:
+                        print ("GOT C0, packet lenght 16, but not needed answer")
+                else:
+                    print ("GOT C0, but packet lenght not 16")
             else:
                 arr.append(line)
                 arr_hex_str.append(dd)
