@@ -27,7 +27,8 @@ for line in string_ps.splitlines():
     if 'schetchik.py' in line:
         pids.append(int(line.split(None, 1)[0]))
 
-pids.pop(-1)
+if (len(pids) > 0):
+    pids.pop(-1)
 
 for pid in pids:
     os.kill(int(pid), signal.SIGINT)
