@@ -1,5 +1,10 @@
 # Program for elektroschetchik Energomera CE307 USB/RS232/COM/Serial to RS485
 # Didenko Alexandr vk.com/Bagunda. https://github.com/Bagunda/energomera_ce307
+# For Onion Omega2s install packages:
+# opkg install python3-light
+# pip3 install paho-mqtt
+# pip3 install pyserial
+# pip3 install requests
 
 import serial
 from subprocess import call
