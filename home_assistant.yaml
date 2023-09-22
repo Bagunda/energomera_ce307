@@ -1,3 +1,4 @@
+# При текущей программе https://github.com/Bagunda/energomera_ce307/blob/main/shetchik.py этот файл уже не актуален, потому что сущности в Home Assistant создаются сами автоматически.
 configuration.yaml:
 
 template:
