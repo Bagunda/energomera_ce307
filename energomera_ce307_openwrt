@@ -1,0 +1,46 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=1
+scriptname="energomera_ce307"
+programfolder=$scriptname
+time_now=$(date  +%Y-%m-%d\ %H:%M:%S)
+
+start() {
+        pid=`ps | grep "[p]ython /root/$programfolder/$scriptname.py" | awk '{ print $1 }'`
+        if [ -z "$pid" ]; then
+            echo $scriptname: Starting program...
+            logger -t bagprocd $scriptname: Starting program...
+            /usr/bin/python3 /root/$programfolder/$scriptname.py 2>/root/$scriptname/$scriptname.error.log &
+        else
+            echo $scriptname: Program is running, so we cannot start it. pid=$pid
+            logger -t bagprocd $scriptname: Program is running, so we cannot start it. pid=$pid
+        fi
+}
+
+stop() {
+        pid=`ps | grep "/root/$programfolder/$scriptname.py" | awk '{ print $1 }'` # !!! Problema esli path or name dlinnoe! Esli dlinnoe - to dannaya funciya vozvraschaet empty pri reboote !!! <<<<
+        if [ -z "$pid" ]; then
+            echo $scriptname: Program is not running
+            logger -t bagprocd $scriptname: Program is not running
+        else
+            echo $scriptname: Stoping program. Pid=$pid
+            logger -t bagprocd $scriptname: Stoping program. Pid=$pid
+            kill $pid
+            sleep 2
+            echo $scriptname: Program stoped
+            logger -t bagprocd $scriptname: Program stoped
+        fi
+}
+
+boot() {
+        sleep 15
+        logger -t bagprocd $scriptname: Start program after boot
+        /usr/bin/python3 /root/$programfolder/$scriptname.py 2>/root/$scriptname/$scriptname.error.log &
+}
+
+restart() {
+        stop
+        sleep 5
+        start
+}
